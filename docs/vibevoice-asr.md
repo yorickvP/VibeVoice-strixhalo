@@ -8,8 +8,7 @@
 **Model:** [VibeVoice-ASR-7B](https://huggingface.co/microsoft/VibeVoice-ASR)<br>
 **Demo:** [VibeVoice-ASR-Demo](https://aka.ms/vibevoice-asr)<br>
 **Report:** [VibeVoice-ASR-Report](https://arxiv.org/pdf/2601.18184)<br>
-**Finetuning:** [finetune-guide](../finetuning-asr/README.md)<br>
-**vLLM:** [vLLM-asr](./vibevoice-vllm-asr.md)<br>
+**Streaming:** [asr-streaming](./vibevoice-asr-streaming.md)<br>
 **Transformers:** [VibeVoice-ASR-HF](https://huggingface.co/microsoft/VibeVoice-ASR-HF)<br>
 
 
@@ -52,45 +51,24 @@ https://github.com/user-attachments/assets/acde5602-dc17-4314-9e3b-c630bc84aefa
 
 
 ## Installation
-We recommend using NVIDIA Deep Learning Container to manage the CUDA environment. 
-
-1. Launch docker
+Dependencies are managed with uv; `pyproject.toml` pins the ROCm 7.13 PyTorch build for gfx1151 (Strix Halo).
 ```bash
-# NVIDIA PyTorch Container 24.07 ~ 25.12 verified. 
-# Previous versions are also compatible.
-sudo docker run --privileged --net=host --ipc=host --ulimit memlock=-1:-1 --ulimit stack=-1:-1 --gpus all --rm -it  nvcr.io/nvidia/pytorch:25.12-py3
-
-## If flash attention is not included in your docker environment, you need to install it manually
-## Refer to https://github.com/Dao-AILab/flash-attention for installation instructions
-# pip install flash-attn --no-build-isolation
+uv sync
 ```
-
-2. Install from github 
-```bash
-git clone https://github.com/microsoft/VibeVoice.git
-cd VibeVoice
-
-pip install -e .
-```
+Triton needs a C compiler (`cc`/`gcc`) at runtime.
 
 ## Usages
 
-### Usage 1: Launch Gradio demo
+### Usage 1: Fast inference (`fast_asr.py`, ROCm)
 ```bash
-apt update && apt install ffmpeg -y # for demo
-
-python demo/vibevoice_asr_gradio_demo.py --model_path microsoft/VibeVoice-ASR --share
+uv run python fast_asr.py [audio path] --context "[hotwords / background info]" --json out.json
 ```
+See the [README](../README.md#fast-inference-fast_asrpy) for details.
 
-### Usage 2: Inference from files directly
+### Usage 2: Reference inference from files (HF `generate()`)
 ```bash
 python demo/vibevoice_asr_inference_from_file.py --model_path microsoft/VibeVoice-ASR --audio_files [add an audio path here] 
 ```
-
-
-## Finetuning
-LoRA (Low-Rank Adaptation) fine-tuning is supported. See [Finetuning](../finetuning-asr/README.md) for detailed guide.
-
 
 
 ## Results

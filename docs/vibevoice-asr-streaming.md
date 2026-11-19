@@ -3,45 +3,18 @@
 **VibeVoice-ASR-Streaming** transcribes while the audio is still arriving, instead of waiting for it to end. It emits text once per audio chunk, so a transcript appears as the speaker talks.
 
 **Non-streaming:** [VibeVoice-ASR](./vibevoice-asr.md)<br>
-**vLLM:** [vLLM-asr-streaming](./vibevoice-vllm-asr-streaming.md)<br>
 
 ## Installation
-We recommend using NVIDIA Deep Learning Container to manage the CUDA environment. 
-
-1. Launch docker
+Dependencies are managed with uv; `pyproject.toml` pins the ROCm 7.13 PyTorch build for gfx1151 (Strix Halo).
 ```bash
-# NVIDIA PyTorch Container 24.07 ~ 25.12 verified. 
-# Previous versions are also compatible.
-sudo docker run --privileged --net=host --ipc=host --ulimit memlock=-1:-1 --ulimit stack=-1:-1 --gpus all --rm -it  nvcr.io/nvidia/pytorch:25.12-py3
-
-## If flash attention is not included in your docker environment, you need to install it manually
-## Refer to https://github.com/Dao-AILab/flash-attention for installation instructions
-# pip install flash-attn --no-build-isolation
+uv sync
 ```
+Triton needs a C compiler (`cc`/`gcc`) at runtime.
+Install ffmpeg as well, which the demo uses to decode audio.
 
-2. Install from github 
-```bash
-git clone https://github.com/microsoft/VibeVoice.git
-cd VibeVoice
+## Usage
 
-pip install -e .
-```
-
-3. Install ffmpeg, which both usages below need to decode audio
-```bash
-apt update && apt install ffmpeg -y
-```
-
-## Usages
-
-### Usage 1: Launch the FastAPI demo
-```bash
-python demo/vibevoice_asr_streaming_fastapi_demo.py --model_path [add the checkpoint path here]
-```
-
-Open `http://localhost:7870`, then record from the microphone or pick a file. The page keeps a WebSocket open for the whole recording, so text appears while you are still speaking.
-
-### Usage 2: Inference from files directly
+### Inference from files
 ```bash
 python demo/vibevoice_asr_streaming_inference_from_file.py --model_path [add the checkpoint path here] --audio_files [add an audio path here]
 ```
